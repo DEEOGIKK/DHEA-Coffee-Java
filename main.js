@@ -6,12 +6,21 @@ const firebaseConfig = {
     projectId: "coffee-java-dhea-cd03c",
     storageBucket: "coffee-java-dhea-cd03c.firebasestorage.app",
     messagingSenderId: "189704530609",
+    databaseURL: "https://coffee-java-dhea-cd03c-default-rtdb.asia-southeast1.firebasedatabase.app",
     appId: "1:189704530609:web:d126bb259164f2bc2b1090"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+// di atas ini konfigurasi buat database, jangan di sebar jangan di otak atik pliis =(
 
+// ini pas web baru di load atau restart
+window.addEventListener("DOMContentLoaded", function(){
+    // hapus semua data yang kesimpen di local storage
+    this.sessionStorage.clear(); 
+});
+
+// ini buat idupin section menu makanan/minuman
 function bukaHalamanMenuMakanan() {
     document.getElementById("HomePage").style = "display: none;";
     document.getElementById("MenuMakananPage").style = "display: flex;";
@@ -25,6 +34,7 @@ function bukaHalamanMenuMinuman() {
     window.document.title = "MENU MINUMAN"
 }
 
+// ini buat skroll otomatis ke section about
 function scrolltoabout() {
     document.getElementById("HomePage").style = "display: flex;";
     document.getElementById("MenuMinumanPage").style = "display: none;";
@@ -38,6 +48,7 @@ function scrolltoabout() {
     }, 500);
 }
 
+// ini buat backtohome tanpa refresh halaman web
 function backtoHome() {
     document.getElementById("HomePage").style = "display: flex;";
     document.getElementById("MenuMinumanPage").style = "display: none;";
@@ -46,24 +57,61 @@ function backtoHome() {
     window.document.title = "COFFEE JAVA - HOME"
 }
 
+// ini buat masukkin data pesanan ke database, data yang masuk: nama user, pesanan, total harga.
 function cekout() {
 
     set(ref(db, `pesanan/${sessionStorage.getItem("namaUser")}`), {
-        nama: "oaiwjhdoiajwdio",
+        nama: sessionStorage.getItem("namaUser"),
         pesanan: sessionStorage.getItem("cartliststring"),
         totalHarga: sessionStorage.getItem("totha")
+    }).then(() => {
+        console.log("Data berhasil disimpan!");
+
+        sessionStorage.clear();
+        window.location.href = "checkout.html"
+
+    }).catch((error) => {
+        alert(error);
     });
-
-    sessionStorage.clear();
-
-    window.location.href = "checkout.html"
-    //masuk database
 }
 
-document.getElementById("checkoutbtn").addEventListener("click", function(){ cekout(); })
+// ini munculin panel input nama setelah klik cekout btn
+function masuknamadulu() {
+    document.getElementById("cart").style = "pointer-events: none;"
+    
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.getElementById("thePage").style = "pointer-events: none;"
+    
+    document.getElementById("alert2").style = "animation: cartOpened 0.6s;";
+    document.getElementById("alert2").style = "display: flex;";
+}
+
+// ini buat cek nama user sebelum masuk database, buat anti data numpuk
+function ceknama() {
+    var nmusr = document.getElementById("inputnamauser").value
+    
+    if(nmusr.trim() !== "") {
+
+        get(ref(db, `pesanan/${nmusr}`)).then((snapshot) => {
+            if(snapshot.exists()) {
+                document.getElementById("inputnamauser").value = "";
+                alert("nama telah di gunakan!")
+            }else {
+                sessionStorage.setItem("namaUser", nmusr);
+                document.getElementById("inputnamauser").value = "";
+                cekout();
+            }
+        })
+    }
+}
+// ini buat ngecek apakah ada input dari button
+document.getElementById("tambahproduk2").addEventListener("click", function(){ceknama();});
+document.getElementById("checkoutbtn").addEventListener("click", function(){ masuknamadulu(); })
 document.getElementById("backbtn").addEventListener("click", function(){ backtoHome(); })
 document.getElementById("scrollbtn").addEventListener("click", function(){ scrolltoabout(); })
 
+// ini tuu buat buka keranjangg, kalo keranjang uda kebuka trus user ngeklik keranjang, keranjang nya ditutup, begitu juga sebaliknya
 var cartCondition = "closed";
 function interactCart() {
     if (document.getElementById("itemslist").innerHTML.trim() === "") {
@@ -116,14 +164,13 @@ function interactCart() {
     }
 }
 
+// ini juga buat ngecek apakah ada signal dari button html, cuma beda tempat aja, biar asig
 document.getElementById("categoryItem-minuman").addEventListener("click", bukaHalamanMenuMinuman)
 document.getElementById("categoryItem-makanan").addEventListener("click", bukaHalamanMenuMakanan)
 document.getElementById("cartbtn").addEventListener("click", function(){ interactCart(); })
 
-// INTERACT PRODUK ITEMS
-
+// ini kayak buat nambahin produk ke keranjang
 var addtoCartValue;
-
 function setelahAlert() {
     if(addtoCartValue) {
         var id = sessionStorage.getItem("id");
@@ -183,9 +230,11 @@ function setelahAlert() {
     }
 }
 
+// button signal
 document.getElementById("tambahproduk").addEventListener("click", function(){ addtoCartValue=true; setelahAlert() })
 document.getElementById("gajaditambahproduk").addEventListener("click", function(){ addtoCartValue=false; setelahAlert() })
 
+// buat nutup alert "masukin produk ini ke keranjang"
 function closeAlert() {
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
@@ -197,6 +246,7 @@ function closeAlert() {
     });
 }
 
+// ini buat ngambil data produk yang di klik, jadi setelah di klik, otomatis datanya ke ambil lalu kesimpen di local storage
 function interactProduct(namaProduk) {
     sessionStorage.setItem("id", namaProduk);
     sessionStorage.setItem("nama", document.getElementById(namaProduk).querySelector("p").textContent);
@@ -215,6 +265,7 @@ function interactProduct(namaProduk) {
     });
 }
 
+// ini signal buat ngambil id produk lalu masuk ke "function interactProduct()"
 //#region MAKANAN
 // MAKANAN - CORE MENU - BAKERY
 document.getElementById("bagelbites").addEventListener("mouseup", () => { interactProduct("bagelbites") });

@@ -211,7 +211,7 @@ div {
   width: 80%;
   margin: auto;
 }
-.btncntinr div {
+.alertbtn {
   width: 400px;
   height: auto;
   text-align: center;
@@ -223,7 +223,24 @@ div {
   cursor: pointer;
   transition: all 0.3s;
 }
-.btncntinr div:hover {
+.alertbtn2 {
+  width: 80%;
+  margin: auto;
+  height: auto;
+  text-align: center;
+  font-size: 25px;
+  background-color: #493323;
+  border-radius: 20px;
+  padding: 20px 0 20px 0;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  margin-bottom: 20px;
+}
+.alertbtn:hover {
+  scale: 1.05;
+}.alertbtn2:hover {
   scale: 1.05;
 }
 .alert h1 {
@@ -238,6 +255,34 @@ div {
 /* ALERT END */
 
 /* HOME */
+
+/* CONTACT PAGE */
+
+.contactpage {
+  height: auto;
+  background-color: #603f26;
+}
+.contactContainer {
+  width: 60%;
+  margin: auto;
+  font-size: 25px;
+  color: white;
+}
+.contactContainer ul {
+  margin-left: 59px;
+}
+.contactContainer iframe {
+  border-radius: 20px;
+}
+.contactContainer p {
+  margin-top: 50px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 20px;
+  color: black;
+}
+
+/* CONTACT PAGE END */
 
 /* ABOUT */
 .about {
